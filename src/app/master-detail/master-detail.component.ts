@@ -93,10 +93,12 @@ linkApplication(accountId: string, pickedApplication: Application) {
       }
     });
 
-    ref.onClose.subscribe((selectedAccount: Account) => {
+    const onCloseSubscription = ref.onClose.subscribe((selectedAccount: Account) => {
       if (selectedAccount) {
-        this.linkApplication(selectedAccount.id,pickedApplication);
-        }
+        console.log('Selected account:', selectedAccount);
+        this.linkApplication(selectedAccount.id, pickedApplication);
+      }
+      onCloseSubscription.unsubscribe(); 
     });
   }
     
