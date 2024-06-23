@@ -1,0 +1,27 @@
+<h2>Select Account</h2>
+<p-table [value]="accounts">
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="id">Id</th>
+      <th pSortableColumn="email">Email</th>
+      <th pSortableColumn="first_name">First Name</th>
+      <th pSortableColumn="last_name">Last Name</th>
+      <th pSortableColumn="date_of_birth">Date of Birth</th>
+      <th pSortableColumn="active">Active</th>
+      <th>Action</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-account>
+    <tr (click)="selectAccount(account)" pSelectableRow>
+      <td>{{ account.id }}</td>
+      <td>{{ account.email }}</td>
+      <td>{{ account.first_name }}</td>
+      <td>{{ account.last_name }}</td>
+      <td>{{ account.date_of_birth }}</td>
+      <td>{{ account.active }}</td>
+      <td>
+        <p-button (click)="selectAccount(account)">Select</p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

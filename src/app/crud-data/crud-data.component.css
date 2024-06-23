@@ -1,0 +1,64 @@
+.forma {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.label {
+    width: 100px;
+
+    margin-right: 10px;
+    text-align: right;
+}
+
+.save {
+    order: 2;
+}
+
+.cancel {
+    order: 1;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    width: 100%;
+    max-width: 90%;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.center-table {
+    text-align: center;
+    padding: 1rem;
+}
+
+.addButton {
+    padding: 1% 0 1% 0;
+}
+
+.application-section {
+    margin-top: 2rem;
+}
+
+.center-table {
+    text-align: center;
+    padding: 1rem;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}

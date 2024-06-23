@@ -1,0 +1,382 @@
+<div *ngIf="loadAccounts" class="center">
+    <p-progressSpinner ariaLabel="loading" />
+</div>
+
+<div *ngIf="!loadAccounts">
+    <div class="container">
+        <div class="card">
+            <div class="center-table">
+                <h2>Accounts</h2>
+                <p-toast></p-toast>
+                <p-button label="Add New Account" icon="pi pi-user" class="addButton"
+                    (click)="showDialogAddAccount()" />
+                <p-dialog header="Edit Profile" [modal]="true" [(visible)]="visible" [style]="{ width: '40rem' }">
+                    <form [formGroup]="newAcount" (ngSubmit)="addNewAccount()">
+                        <div class="forma">
+                            <label for="email" class="label">email</label>
+                            <input pInputText id="email" class="flex-auto" formControlName="email" autocomplete="off" />
+                            <div *ngIf="newAcount.get('email')?.touched && newAcount.get('email')?.invalid">
+                                <small *ngIf="newAcount.get('email')?.errors?.['required']">Email is required.</small>
+                                <small *ngIf="newAcount.get('email')?.errors?.['email']">Enter a valid email.</small>
+                            </div>
+                        </div>
+                        <div class="forma">
+                            <label for="first_name" class="label">first_name</label>
+                            <input pInputText id="first_name" class="flex-auto" formControlName="first_name"
+                                autocomplete="off" />
+                        </div>
+                        <div class="forma">
+                            <label for="last_name" class="label">last_name</label>
+                            <input pInputText id="last_name" class="flex-auto" formControlName="last_name"
+                                autocomplete="off" />
+                        </div>
+                        <div class="forma">
+                            <label for="date_of_birth" class="label">date_of_birth</label>
+                            <input pInputText type="date" id="date_of_birth" class="flex-auto"
+                                formControlName="date_of_birth" autocomplete="off" />
+                        </div>
+                        <div class="forma">
+                            <label for="active" class="label">active</label>
+                            <p-dropdown [options]="status" appendTo="body" id="active" formControlName="active"
+                                [style]="{'width':'100%'}"></p-dropdown>
+                        </div>
+                        <div class="button-container">
+                            <p-button label="Cancel" severity="secondary" class="cancel" (click)="visible = false" />
+                            <p-button label="Save" class="save" type="submit" [disabled]="newAcount.invalid" />
+                        </div>
+                    </form>
+                </p-dialog>
+
+                <div *ngIf="!filterbyDateBoolean">
+                    <p-table [value]="accounts" dataKey="id" editMode="row" [tableStyle]="{'min-width': '50rem'}">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="email" style="width:15%">email
+                                    <p-sortIcon field="email" />
+
+                                </th>
+                                <th style="width:15%">first_name</th>
+                                <th style="width:15%">last_name</th>
+                                <th style="width:25%">date_of_birth
+                                </th>
+                                <th style="width:15%">active</th>
+                                <th style="width:15%">Action</th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <p-columnFilter type="text" field="email" [showClearButton]="false" />
+                                </th>
+
+                                <th></th>
+                                <th></th>
+                                <th style="width:15%">
+                                    <p-calendar [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true"
+                                        [showIcon]="true" (onSelect)="onCloseCalendar()" />
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+
+                        </ng-template>
+                        <ng-template pTemplate="body" let-account let-editing="editing" let-ri="rowIndex">
+                            <tr [pEditableRow]="account">
+                                <td>
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <input pInputText type="text" [(ngModel)]="account.email" />
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{account.email}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td>
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <input pInputText type="text" [(ngModel)]="account.first_name" required />
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{account.first_name}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td>
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <input pInputText type="text" [(ngModel)]="account.last_name" required />
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{account.last_name}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td>
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <input pInputText type="date" [(ngModel)]="account.date_of_birth"
+                                                required />
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{account.date_of_birth}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td>
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <p-dropdown [options]="status" appendTo="body" [(ngModel)]="account.active"
+                                                [style]="{'width':'100%'}"></p-dropdown>
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{account.active}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td>
+                                    <div class="flex align-items-center justify-content-center gap-2">
+                                        <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow
+                                            icon="pi pi-pencil" (click)="onRowEditInit(account)"
+                                            class="p-button-rounded p-button-text"></button>
+                                        <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow
+                                            icon="pi pi-check" (click)="onRowEditSave(account)"
+                                            class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                                        <button *ngIf="editing" pButton type="button" pCancelEditableRow
+                                            icon="pi pi-times" (click)="onRowEditCancel(account, ri)"
+                                            class="p-button-rounded p-button-text p-button-danger"></button>
+                                        <button pButton pRipple type="button" icon="pi pi-trash"
+                                            (click)="deleteSelectedAccount(account)"
+                                            class="p-button-rounded p-button-text p-button-danger mr-2"></button>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+
+            <div *ngIf="filterbyDateBoolean">
+                <p-table [value]="filteredAccounts" dataKey="id" editMode="row" [tableStyle]="{'min-width': '50rem'}">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="email" style="width:15%">email
+
+                            </th>
+                            <th style="width:15%">first_name</th>
+                            <th style="width:15%">last_name</th>
+                            <th style="width:25%">date_of_birth
+                            </th>
+                            <th style="width:15%">active</th>
+                            <th style="width:15%">Action</th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <p-columnFilter type="text" field="email" [showClearButton]="false" />
+                            </th>
+
+                            <th></th>
+                            <th></th>
+                            <th style="width:15%">
+                                <p-calendar [(ngModel)]="rangeDates" selectionMode="range" [readonlyInput]="true"
+                                    [showIcon]="true" (onSelect)="onCloseCalendar()" />
+
+                                    <p-button *ngIf="rangeDates && rangeDates.length === 2" icon="pi pi-filter-slash" [rounded]="true" [text]="true" (click)="filterWithoutRange()" />
+                            </th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+
+                    </ng-template>
+                    <ng-template pTemplate="body" let-account let-editing="editing" let-ri="rowIndex">
+                        <tr [pEditableRow]="account">
+                            <td>
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <input pInputText type="text" [(ngModel)]="account.email" />
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        {{account.email}}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <input pInputText type="text" [(ngModel)]="account.first_name" required />
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        {{account.first_name}}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <input pInputText type="text" [(ngModel)]="account.last_name" required />
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        {{account.last_name}}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <input pInputText type="date" [(ngModel)]="account.date_of_birth" required />
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        {{account.date_of_birth}}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>
+                                <p-cellEditor>
+                                    <ng-template pTemplate="input">
+                                        <p-dropdown [options]="status" appendTo="body" [(ngModel)]="account.active"
+                                            [style]="{'width':'100%'}"></p-dropdown>
+                                    </ng-template>
+                                    <ng-template pTemplate="output">
+                                        {{account.active}}
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <td>
+                                <div class="flex align-items-center justify-content-center gap-2">
+                                    <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow
+                                        icon="pi pi-pencil" (click)="onRowEditInit(account)"
+                                        class="p-button-rounded p-button-text"></button>
+                                    <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow
+                                        icon="pi pi-check" (click)="onRowEditSave(account)"
+                                        class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                                    <button *ngIf="editing" pButton type="button" pCancelEditableRow icon="pi pi-times"
+                                        (click)="onRowEditCancel(account, ri)"
+                                        class="p-button-rounded p-button-text p-button-danger"></button>
+                                    <button pButton pRipple type="button" icon="pi pi-trash"
+                                        (click)="deleteSelectedAccount(account)"
+                                        class="p-button-rounded p-button-text p-button-danger mr-2"></button>
+
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+
+
+            <div class="application-section">
+                <div class="center-table">
+                    <h2>Application</h2>
+
+
+                    <p-button label="Add New Application" icon="pi pi-plus" class="addButton"
+                        (click)="showDialogAddApplication()" />
+                    <p-dialog header="Add new Application" [modal]="true" [(visible)]="visible1"
+                        [style]="{ width: '40rem' }">
+                        <form [formGroup]="newApp" (ngSubmit)="addNewApplication()">
+                            <div class="forma">
+                                <label for="name" class="label">name</label>
+                                <input pInputText id="name" class="flex-auto" formControlName="name"
+                                    autocomplete="off" />
+                            </div>
+                            <div class="forma">
+                                <label for="version" class="label">version</label>
+                                <input pInputText id="version" class="flex-auto" formControlName="version"
+                                    autocomplete="off" />
+                            </div>
+                            <div class="forma">
+                                <label for="url" class="label">url</label>
+                                <input pInputText id="url" class="flex-auto" formControlName="url" autocomplete="off" />
+                            </div>
+                            <div class="button-container">
+                                <p-button label="Cancel" severity="secondary" class="cancel"
+                                    (click)="visible1 = false" />
+                                <p-button label="Save" class="save" type="submit" />
+                            </div>
+                        </form>
+                    </p-dialog>
+                    <p-table [value]="allApplications" dataKey="id" editMode="row"
+                        [tableStyle]="{'min-width': '50rem'}">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="name" style="width:15%">Name
+                                    <p-sortIcon field="name" />
+                                </th>
+                                <th pSortableColumn="version" style="width:15%">Version
+                                    <p-sortIcon field="version" />
+                                </th>
+                                <th style="width:15%">Url</th>
+                                <th style="width:15%">Action</th>
+
+                            </tr>
+                            <tr>
+                                <th>
+                                    <p-columnFilter type="text" field="name" [showClearButton]="false" />
+                                </th>
+                                <th>
+                                    <p-columnFilter type="text" field="version" [showClearButton]="false" />
+                                </th>
+                                <th></th>
+                                <th></th>
+
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-allApplication let-editing="editing" let-ri="rowIndex">
+                            <tr [pEditableRow]="allApplication">
+                                <td>
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <input pInputText type="text" [(ngModel)]="allApplication.name" />
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{allApplication.name}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td>
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <input pInputText type="text" [(ngModel)]="allApplication.version"
+                                                required />
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{allApplication.version}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td>
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <input pInputText type="text" [(ngModel)]="allApplication.url" required />
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{allApplication.url}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+
+                                <td>
+                                    <div class="flex align-items-center justify-content-center gap-2">
+                                        <button *ngIf="!editing" pButton pRipple type="button" pInitEditableRow
+                                            icon="pi pi-pencil" (click)="onRowEditInitApplication(allApplication)"
+                                            class="p-button-rounded p-button-text"></button>
+                                        <button *ngIf="editing" pButton pRipple type="button" pSaveEditableRow
+                                            icon="pi pi-check" (click)="onRowEditSaveApplication(allApplication)"
+                                            class="p-button-rounded p-button-text p-button-success mr-2"></button>
+                                        <button *ngIf="editing" pButton type="button" pCancelEditableRow
+                                            icon="pi pi-times" (click)="onRowEditCancelApplication(allApplication, ri)"
+                                            class="p-button-rounded p-button-text p-button-danger"></button>
+                                        <button pButton pRipple type="button" icon="pi pi-trash"
+                                            (click)="deleteApplication(allApplication)"
+                                            class="p-button-rounded p-button-text p-button-danger mr-2"></button>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                    <p-confirmDialog [style]="{ width: '450px' }" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
